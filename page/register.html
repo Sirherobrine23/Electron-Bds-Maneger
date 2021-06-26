@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bds Maneger Register</title>
+    <script>
+        var Option = (function(){
+            var href = location.href.split("?")
+            var params = {}
+            if (href.length >= 2) {
+                for (let parse of href[1].split("&")) {
+                    parse = parse.split("=")
+                    const value = JSON.parse(parse[1].trim())
+                    if (/"*"/.test(value)) value = JSON.parse(parsevalue)
+                    params[parse[0].trim()] = value
+                }
+            }
+            return params
+        })()
+        if (Option.error === 3) alert("Erro")
+    </script>
+</head>
+<body>
+    <div style="text-align: center;">
+        <h1>Register In Bds Manager to acess</h1>
+        <li>Password must be at least 8 characters</li>
+        <li>The User must be at least 5 Characters long</li>
+        <p>
+            <form action="/registerSave" method="POST" id="subForm">
+                <input type="text" name="user">
+                <p><input type="password" name="pass"></p>
+                <p><input type="hidden" name="uuid" id="uuid"></p>
+            </form>
+        </p>
+    </div>
+    <script>
+        (function(){
+            var href = location.href.split("/")
+            href = href[href.length -1];
+            document.getElementById("uuid").value = href.split("?")[0];
+            const buttom = document.createElement("button");
+            buttom.type = "submit";
+            buttom.innerHTML = "Register"
+            document.getElementById("subForm").appendChild(buttom)
+        })()
+    </script>
+</body>
+</html>

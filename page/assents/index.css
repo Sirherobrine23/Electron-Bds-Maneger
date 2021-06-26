@@ -1,0 +1,90 @@
+@font-face {
+    font-family: minecraft;
+    src: url(Minecraft.ttf);
+}
+@font-face {
+    font-family: minecraft-bold;
+    src: url(Mojang-Bold.ttf);
+}
+@font-face {
+    font-family: minecraft-regular;
+    src: url(Mojang-Regular.ttf);
+}
+
+.light {
+    --text-primary: #1f1f1f;
+    --text-secondary: #000000;
+    --bg-primary: #ffffff;
+    --bg-secondary: #e4e4e4;
+    --box-primary: rgba(0,0,0,0.4);
+    --border-color: rgba(0,0,0,0.5);
+    --color-error: red;
+    --color-success: rgb(17, 173, 14);
+}
+
+.dark{
+    --text-primary: #fff;
+    --text-secondary: #fff;
+    --bg-primary: #1d1d1d;
+    --bg-secondary: #3e3e3e;
+    --box-primary: rgba(0,0,0,0.4);
+    --border-color: rgba(0,0,0,0.5);
+    --color-error: rgb(164, 29, 29);
+    --color-success: rgb(17, 173, 14);
+}
+
+*{
+    font-family: "minecraft", "minecraft-bold", "minecraft-regular";
+    color: var(--text-primary);
+}
+
+a {
+    color: var(--text-secondary);
+}
+
+html, body {
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+}
+
+::-webkit-scrollbar {
+    width: 0.45rem;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-primary);
+}
+
+.logDiv {
+    margin-top: 12px;
+    height: 80vh;
+    width: 95vw;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    margin-left: 2vw;
+    margin-right: 2vw;
+    overflow: scroll;
+}
+
+.logDiv p {
+    margin-bottom: -10px;
+    margin-left: 20px;
+}
+
+header {
+    background-color: var(--bg-secondary);
+}
+
+.logoutbuttom{
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.CommandArea {
+    background-color: var(--bg-primary);
+    color: var(--text-secondary)
+}

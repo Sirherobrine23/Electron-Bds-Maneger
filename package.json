@@ -1,0 +1,43 @@
+{
+    "name": "bds-manege",
+    "version": "1.9.2",
+    "description": "The Bds Maneger, control your server with Electron",
+    "main": "index.js",
+    "private": false,
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon -e js,html,css index.js",
+        "test": "exit 0",
+        "eslint": "eslint . --fix",
+        "nexe": "node NexeBuild.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/The-Bds-Maneger/Bds-Maneger.git"
+    },
+    "keywords": [
+        "minecraft",
+        "bds",
+        "bds-server",
+        "Windows",
+        "linux",
+        "macos"
+    ],
+    "author": "Matheus Sampaio Queiroga (Sirherobrine23) <srherobrine20@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/The-Bds-Maneger/issues"
+    },
+    "homepage": "https://github.com/The-Bds-Maneger#readme",
+    "dependencies": {
+        "@the-bds-maneger/core": "^1.10.0",
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "minimist": "^1.2.5",
+        "nexe": "*",
+        "nodemon": "^2.0.7",
+        "open": "^8.2.1",
+        "socket.io": "^4.1.2",
+        "uuid": "^8.3.2"
+    }
+}

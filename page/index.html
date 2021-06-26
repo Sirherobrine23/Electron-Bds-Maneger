@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/assents/index.css">
+    <script>
+        const UserUUID="@UUID"
+        const socket = io();
+        setInterval(() => {if (socket.disconnected) location.href = "/login"}, 500);
+    </script>
+    <title>Bds Maneger</title>
+</head>
+<header>
+    <form action="/logout">
+        <button type="submit" class="logoutbuttom">Logout<input type="hidden" name="uuid" id="logoutButtom"></button>
+    </form>
+    <div class="BasicButtons"><a href="#Start" id="start">Start</a><a href="#Stop" id="stop">Stop</a></div>
+    <script>document.getElementById("logoutButtom").value = UserUUID</script>
+</header>
+<body class="dark">
+    <div class="logDiv" id="logDir"></div>
+    <div class="CommandArea">
+        <input type="hidden" name="uuid" value="@UUID">
+        <div id="SendCommand">Command: <input type="text" id="command" name="command"></div>
+        <script>const doC = document.getElementById("SendCommand");doC.onkeypress = function(event){const code = event.which;if (code === 13) {const uid = sessionStorage.getItem("bdsCoreUuid");const command = document.getElementById("command").value;fetch("/command", {method: "POST", mode: "cors", headers: {command: command, coreuid: uid, uuid: UserUUID}})}}</script>
+    </div>
+</body>
+<script>
+    document.getElementById("start").onclick = function(){
+        fetch("/service", {headers: {command: "start", uuid: UserUUID}, method: "POST", mode: "cors"})
+            .then(res => {if (res.ok) return res.text(); else throw res})
+            .then(res => sessionStorage.setItem("bdsCoreUuid", res))
+            .catch(err => alert(err));
+    }
+    document.getElementById("stop").onclick = function(){
+        fetch("/service", {headers: {command: "stop", uuid: UserUUID, bdscoreUuid: sessionStorage.getItem("bdsCoreUuid")}, method: "POST", mode: "cors"})
+            .then(res => {if (res.ok) sessionStorage.removeItem("bdsCoreUuid"); else alert("Try again there was an Error")})
+    }
+    const log = document.getElementById("logDir")
+    socket.on("BdsLog", function(msg) {
+        for (let text  of msg){
+            var item = document.createElement("p");
+            item.innerHTML = text;
+            log.appendChild(item);
+            console.log(text)
+            // window.scrollTo(0, document.getElementById("logDir").scrollHeight);
+        }
+        
+    });
+</script>
+</html>
