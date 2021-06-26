@@ -1,0 +1,31 @@
+{
+	"name": "Node.js",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": {}
+	},
+	"settings": { 
+		"terminal.integrated.automationShell.linux": "/usr/bin/zsh"
+	},
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"dbaeumer.vscode-eslint",
+		"formulahendry.auto-rename-tag",
+		"ms-vscode-remote.remote-containers",
+		"benshabatnoam.google-translate-ext",
+		"wix.vscode-import-cost",
+		"eg2.vscode-npm-script",
+		"christian-kohler.npm-intellisense",
+		"christian-kohler.path-intellisense",
+		"kodetech.electron-debug",
+		"coenraads.bracket-pair-colorizer",
+		"aaron-bond.better-comments",
+		"msjsdiag.debugger-for-chrome",
+		"smcpeak.default-keys-windows"
+	],
+	"forwardPorts": [
+		3000
+	],
+	// "postCreateCommand": "npm install --no-save",
+	"remoteUser": "node"
+}
