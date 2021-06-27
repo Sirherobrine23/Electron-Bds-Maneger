@@ -21,7 +21,7 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: 16.x
+          node-version: 15.x
 
       - name: Install NASM (Windows)
         if: matrix.os == 'windows-latest'
