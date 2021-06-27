@@ -4,9 +4,40 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bds Maneger config</title>
+    <link rel="icon" href="https://github.com/The-Bds-Maneger/Bds-Maneger-Electron/raw/main/bds_pages/assents/mcpe.ico">
+    <title>Bds Maneger Server Config</title>
 </head>
 <body>
-    
+    <form action="/index/settings/@{{UUID}}/save" method="post">
+        <p>World Name: <input name="world" type="text"></p>
+        <p>Server Description/motd: <input name="description" type="text"></p>
+        <p>Default Gamemode: <select name="gamemode">
+            <option value="survival">Survival</option>
+            <option value="creative">Creative</option>
+            <option value="hardcore">Hardcore</option>
+        </select></p>
+        <p>Default difficulty: <select name="difficulty">
+            <option value="easy">Easy</option>
+            <option value="peaceful">Peaceful</option>
+            <option value="normal">Normal</option>
+            <option value="hard">Hard</option>
+        </select></p>
+        <input name="players" type="number">
+        <input name="commands" type="checkbox">
+        <input name="account" type="checkbox">
+        <input name="whitelist" type="checkbox">
+        <input name="port" type="number">
+        <input name="portv6" type="number">
+        <input name="seed" type="number">
+        <input type="submit" id="SaveButtom" value="Save Server Config">
+    </form>
+    <script>
+        fetch(`http://${location.hostname}:1932/info`).then(res => {if (res.ok) return res.json(); else return {}}).then(res => {
+            if (res.server.running) {
+                document.getElementById("SaveButtom").setAttribute("disabled", null);
+                alert("It is recommended for the server to save changes")
+            }
+        })
+    </script>
 </body>
 </html>

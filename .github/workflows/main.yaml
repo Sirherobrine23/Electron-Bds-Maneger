@@ -1,0 +1,43 @@
+name: Binaries
+on: 
+  push:
+    branches:
+      - main
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  BuildBDSWeb:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - Linux-Arm64
+    runs-on: "${{ matrix.os }}"
+    name: "System ${{ matrix.os }}"
+    steps:
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 16.x
+
+      - name: Checkout Repository
+        uses: actions/checkout@master
+
+      - name: NPM Install packages
+        run: npm install --no-save
+
+      - name: Build Bds Maneger with Nexe
+        run: npm run nexe
+      
+      - name: Releases
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: "The Bds Maneger Release"
+          tag_name: "Bds_Maneger_${{ github.run_id }}"
+          files: "Bds_Maneger_Bin-*"
+          body: "${{ matrix.os }}"

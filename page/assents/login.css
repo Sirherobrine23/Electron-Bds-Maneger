@@ -1,0 +1,8 @@
+.Login_status {
+    margin-left: 20vw;
+    margin-top: 10vh;
+}
+
+.LoginClass input {
+    background-color: var(--bg-primary);
+}

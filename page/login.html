@@ -4,17 +4,26 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://github.com/The-Bds-Maneger/Bds-Maneger-Electron/raw/main/bds_pages/assents/mcpe.ico">
+    <link rel="stylesheet" href="/assents/index.css">
+    <link rel="stylesheet" href="/assents/login.css">
     <title>Bds Maneger Login</title>
 </head>
 <body>
     <div style="text-align: center;">
-        <div><h1>The Bds Maneger Project - Login Page</h1></div>
-        <div><p><a href="/register">Register</a></p></div>
-        <form method="POST" action="/GetUserID">
+        <div><h1>The Bds Maneger Project</h1></div>
+        <form method="POST" action="/GetUserID" class="LoginClass">
             <input type="text" name="user" placeholder="Username">
             <p><input type="password" name="pass" placeholder="Username Passworld"></p>
-            <button type="submit">Login</button>
+            <button type="submit" class="login_submit">Login</button>
         </form>
+        <div><p><a href="/register">Register</a></p></div>
+    </div>
+    <div class="Login_status">
+        <div><h2>Server Status</h2></div>
+        <p>Server Status: <span id="BdsStatus" style="color: blue">NULL</span>, Server: <span id="BdsPlatform" style="color: #926c4d;">NULL</span></p>
+        <p>Player Limit on Server: <span id="BdsMaxPlayers" style="color: yellow;">0</span>, Total players online on the server: <span id="BdsCurrentPlayers" style="color: yellow;">0</span></p>
+        <script>fetch(`http://${location.hostname}:1932/info`).then(res => {if (res.ok) return res.json(); else return {}}).then(res => {document.getElementById("BdsStatus").innerHTML = (function (){if (res.server.running) {document.getElementById("BdsStatus").style.color = "green";return "Running"} else {document.getElementById("BdsStatus").style.color = "red";return "Stoped"}})();document.getElementById("BdsPlatform").innerHTML = res.server.platform;document.getElementById("BdsMaxPlayers").innerHTML = res.server["max_players"];});fetch(`http://${location.hostname}:1932/players?status=online`).then(res => {if (res.ok) return res.json(); else return {}}).then(res => {document.getElementById("BdsCurrentPlayers").innerHTML = Object.getOwnPropertyNames(res).length})</script>
     </div>
 </body>
 </html>

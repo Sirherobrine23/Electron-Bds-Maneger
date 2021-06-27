@@ -11,18 +11,7 @@
     src: url(Mojang-Regular.ttf);
 }
 
-.light {
-    --text-primary: #1f1f1f;
-    --text-secondary: #000000;
-    --bg-primary: #ffffff;
-    --bg-secondary: #e4e4e4;
-    --box-primary: rgba(0,0,0,0.4);
-    --border-color: rgba(0,0,0,0.5);
-    --color-error: red;
-    --color-success: rgb(17, 173, 14);
-}
-
-.dark{
+:root {
     --text-primary: #fff;
     --text-secondary: #fff;
     --bg-primary: #1d1d1d;
@@ -36,6 +25,19 @@
 *{
     font-family: "minecraft", "minecraft-bold", "minecraft-regular";
     color: var(--text-primary);
+}
+
+.login_submit {
+    background-color: var(--bg-secondary);
+    border-radius: 15px;
+    height: 40px;
+    width: 125px;
+    transition: linear 250ms;
+}
+
+.login_submit:hover {
+    border-radius: 5px;
+    background-color: rgb(0, 104, 194);
 }
 
 a {
@@ -61,11 +63,11 @@ html, body {
 .logDiv {
     margin-top: 12px;
     height: 80vh;
-    width: 95vw;
+    /* width: 80vw; */
     background-color: var(--bg-secondary);
     color: var(--text-primary);
-    margin-left: 2vw;
-    margin-right: 2vw;
+    margin-left: -1vw;
+    margin-right: -0.5vw;
     overflow: scroll;
 }
 
@@ -74,17 +76,26 @@ html, body {
     margin-left: 20px;
 }
 
-header {
-    background-color: var(--bg-secondary);
-}
-
+/* Logut Server */
 .logoutbuttom{
     padding: 0;
     border: none;
     background: none;
 }
 
-.CommandArea {
-    background-color: var(--bg-primary);
-    color: var(--text-secondary)
+
+/* Command div */
+.CommandDiv {
+    margin-top: 3vh;
+}
+.command_input {
+    height: 100%;
+    width: 50vw;
+    margin-left: 10vw;
+    color: var(--bg-secondary)
+}
+.command_send {
+    height: 100%;
+    margin-left: 2vh;
+    background-color: var(--bg-secondary);
 }

@@ -2,15 +2,15 @@
 const express = require("express");
 const app = express();
 const http = require("http");
-const { resolve } = require("path");
+const { resolve, join } = require("path");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-const bds = require("@the-bds-maneger/core");
 const { existsSync, writeFileSync, readFileSync } = require("fs");
 const uuid = require("uuid").v4
 const bodyParser = require("body-parser");
 const { exit } = require("process");
+const bds = require("@the-bds-maneger/core");
 
 const options = require("minimist")(process.argv.slice(2));
 
@@ -28,6 +28,9 @@ if (options.h || options.help){
 
 const BdsPort = (options.port || options.p || 3000)
 const PathExec = (options.cwd || process.cwd())
+
+// Enable Bds Maneger Core API
+require("@the-bds-maneger/core/rest/api").api()
 
 // Register
 const UserConfig = resolve(PathExec, "User.json");
@@ -96,18 +99,21 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
 // Socket.io
-io.on("connection", (socket) => {
-    console.log(`User Id Connected: ${socket.id}`);
-    socket.on("disconnect", ()=>{
-        console.log(`Usuario desconectado ${socket.id}`);
-    })
-});
-
-function sendLog(data){
-    data = `${data}`.split("\n").filter(data =>{return (data !== "")})
+function sendLog(data = ""){
+    data = data.split("\n").filter(data =>{return (data !== "")})
     io.emit("BdsLog", data);
     for (let log of data) console.log(log);
 }
+
+io.on("connection", (socket) => {
+    console.log(`User Id Connected: ${socket.id}`);
+    const parseLogFile = readFileSync(join(bds.BdsSettigs.GetPaths("log"), "latest.log"), "utf8").split("\n").filter(data =>{return (data !== "")})
+    socket.send(parseLogFile)
+    socket.on("disconnect", ()=>{
+        console.log(`User disconnected ${socket.id}`);
+    })
+});
+
 
 // URi
 app.use("/assents", express.static(resolve(__dirname, "page/assents/")))
@@ -117,9 +123,23 @@ app.get("/index", (req, res)=>{
     const body = req.query
     if (checkUUID(body.uuid)) {
         var Index = readFileSync(resolve(__dirname, "page/index.html"), "utf8").toString();
-        Index = Index.split("@UUID").join(body.uuid)
+        Index = Index.split("@{{UUID}}").join(body.uuid)
         return res.send(Index)
     } else res.redirect("/login")
+})
+
+app.get("/index/settings/:UUID", (req, res)=>{
+    const body = req.params
+    if (checkUUID(body.UUID)) {
+        var ConfigHTML = readFileSync(resolve(__dirname, "page/config.html"), "utf8")
+        ConfigHTML = ConfigHTML.split("@{{UUID}}").join(body.UUID)
+        return res.send(ConfigHTML);
+    }
+    else res.redirect("/login")
+})
+
+app.post("/index/settings/:UUID/save", (req, res)=>{
+    res.sendStatus(401)
 })
 
 app.get("/logout", (req, res)=>{
@@ -190,24 +210,29 @@ if (Config.register){
 }
 app.get("/login", (req, res) => {res.sendFile(resolve(__dirname, "page/login.html"))})
 
-// Bds Core Bridge
+// Bds Maneger Services
 app.post("/service", (req, res) => {
     const _h = req.headers.command;
     const _uuid = req.headers.uuid;
     // Check uuid session
     if (!(checkUUID(_uuid))) return res.sendStatus(401);
     if (_h === "start") {
+        if (bds.detect()) return res.json({
+            status: false
+        })
         const bdsstart = bds.start();
-        bdsstart.log(data => sendLog(data))
-        return res.send(bdsstart.uuid)
+        bdsstart.log(sendLog)
+        global.TheRunUUID = bdsstart.uuid
+        return res.send({
+            status: true
+        })
     } else if (_h === "stop") {
-        const JsS = {
-            exe: global.BdsExecs,
-            uuid: _uuid,
-            bdscoreUuid: req.headers["bdscoreuuid"],
-            V2: req.headers
-        }
-        return res.send(global.BdsExecs[JsS.bdscoreUuid].stop())
+        if (bds.detect()) return res.json({
+            rtu: global.BdsExecs[global.TheRunUUID].stop(),
+            status: true
+        }); else return res.json({
+            status: false
+        })
     }
     return res.statusCode(401)
 });
@@ -217,12 +242,10 @@ app.post("/command", (req, res) => {
     const body = req.headers
     console.log(body);
     if (!(checkUUID(body.uuid))) return res.status(402).send("UUID Error");
-    const coreuid = body["coreuid"]
-    if (global.BdsExecs[coreuid]) {
-        global.BdsExecs[coreuid].command(body.command, function(d){res.send(d)})
-    } else res.status(401).send("Core UID Not exist"+ coreuid)
+    if (global.BdsExecs[global.TheRunUUID]) {
+        global.BdsExecs[global.TheRunUUID].command(body.command, function(d){res.send(d)})
+    } else res.status(401).send("Start Server")
 })
 
-server.listen(BdsPort, () => {
-  console.log(`listening on *:${BdsPort}`);
-});
+// Listen Server
+server.listen(BdsPort, () => {console.log(`listening on *:${BdsPort}`)});

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://github.com/The-Bds-Maneger/Bds-Maneger-Electron/raw/main/bds_pages/assents/mcpe.ico">
+    <link rel="stylesheet" href="/assents/index.css">
+    <link rel="stylesheet" href="/assents/Register.css">
     <title>Bds Maneger Register</title>
     <script>
         var Option = (function(){
@@ -12,14 +15,17 @@
             if (href.length >= 2) {
                 for (let parse of href[1].split("&")) {
                     parse = parse.split("=")
-                    const value = JSON.parse(parse[1].trim())
-                    if (/"*"/.test(value)) value = JSON.parse(parsevalue)
+                    var value = parse[1].trim()
+                    if (/"/.test(value)) value = JSON.parse(value)
                     params[parse[0].trim()] = value
                 }
             }
             return params
         })()
         if (Option.error === 3) alert("Erro")
+        if (Option.error === 15) alert("Short Username")
+        if (Option.error === 16) alert("Short Passworld")
+        if (Option.error === "A") alert("User already exists")
     </script>
 </head>
 <body>
@@ -28,7 +34,7 @@
         <li>Password must be at least 8 characters</li>
         <li>The User must be at least 5 Characters long</li>
         <p>
-            <form action="/registerSave" method="POST" id="subForm">
+            <form action="/registerSave" method="POST" id="subForm" class="UserRegister">
                 <input type="text" name="user">
                 <p><input type="password" name="pass"></p>
                 <p><input type="hidden" name="uuid" id="uuid"></p>
@@ -43,6 +49,7 @@
             const buttom = document.createElement("button");
             buttom.type = "submit";
             buttom.innerHTML = "Register"
+            buttom.style.backgroundColor = "var(--bg-secondary)"
             document.getElementById("subForm").appendChild(buttom)
         })()
     </script>

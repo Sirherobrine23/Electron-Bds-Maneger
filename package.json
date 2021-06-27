@@ -1,7 +1,7 @@
 {
     "name": "bds-manege",
-    "version": "1.9.2",
-    "description": "The Bds Maneger, control your server with Electron",
+    "version": "1.10.1",
+    "description": "A fully web manager, and versatile.",
     "main": "index.js",
     "private": false,
     "scripts": {
