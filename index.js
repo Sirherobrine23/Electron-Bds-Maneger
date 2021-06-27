@@ -20,7 +20,7 @@ if (options.h || options.help){
         "",
         "Options:",
         "   -p or --port            Bds Maneger Port, default 3000",
-        `   -cwd                    Path to storage files, default current folder (${process.cwd()})`,
+        `   --cwd                   Path to storage files, default current folder (${process.cwd()})`,
     ]
     console.log(help.join("\n"));
     exit()
