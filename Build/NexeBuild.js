@@ -8,6 +8,7 @@ const files = [
 compile({
     name: "Bds Maneger",
     build: true,
+    loglevel: "verbose",
     input: resolve(__dirname, "..", "index.js"),
     output: resolve(__dirname,  "..",  `Bds_Maneger_Bin-${process.platform}-${process.arch}`),
     resources: files,
