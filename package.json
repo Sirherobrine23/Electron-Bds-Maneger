@@ -9,7 +9,7 @@
         "dev": "nodemon -e js,html,css index.js",
         "test": "exit 0",
         "eslint": "eslint . --fix",
-        "nexe": "node NexeBuild.js"
+        "nexe": "node Build/NexeBuild.js"
     },
     "repository": {
         "type": "git",
