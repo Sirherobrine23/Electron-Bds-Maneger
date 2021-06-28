@@ -7,11 +7,28 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  deleteOldReleases:
+    runs-on: ubuntu-latest
+    name: Delete old releases
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Delete Old Releases
+      uses: dev-drprasad/delete-older-releases@master
+      with:
+        delete_tags: true
+        keep_latest: 1
+        delete_tag_pattern: Pre_Bds_Maneger_*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   BuildBDSWeb:
     strategy:
       matrix:
         os:
           - ubuntu-latest
+          - ubuntu-20.04
           - windows-latest
           - macos-latest
           - ARM64
@@ -27,54 +44,54 @@ jobs:
         if: matrix.os == 'windows-latest'
         uses: ilammy/setup-nasm@v1.2.0
 
-      - name: Install Arm64 Dependecies
-        if: matrix.os == 'ARM64'
-        run: |
-          sudo apt update
-          sudo apt install -y python python3 g++ build-essential make ca-certificates wget curl dpkg-dev unzip zip jq git
-
       - name: Checkout Repository
         uses: actions/checkout@master
 
       - name: NPM Install packages
         run: npm install --no-save
 
-      - name: Build Bds Maneger with Nexe
+      - name: Build Bds Maneger with Nexe (AMD64)
+        if : matrix.os != 'ubuntu-20.04'
         run: npm run nexe
-      
+
+      - name: Build Bds Maneger with Nexe (AMD64)
+        if : matrix.os == 'ubuntu-20.04'
+        run: npm run nexe:android
+
       - name: Releases
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           name: "The Bds Maneger Release"
-          tag_name: "Bds_Maneger_${{ github.run_id }}"
-          files: "Bds_Maneger_Bin-*"
+          tag_name: "Pre_Bds_Maneger_${{ github.run_id }}"
+          files: "Bds_Maneger_Portable-*"
           body: "${{ matrix.os }}"
-  Android:
-    runs-on: "ARM64"
-    name: "System Android"
-    steps:
-      - name: Setup NodeJS
-        uses: actions/setup-node@v2.1.5
-        with:
-          node-version: 15.x
+          prerelease: true
 
-      - name: Checkout Repository
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_ORG_USER }}
+          password: ${{ secrets.DOCKER_ORG_PASS }}
+
+      - name: checkout
         uses: actions/checkout@master
 
-      - name: NPM Install packages
-        run: npm install --no-save
-
-      - name: Build Bds Maneger with Nexe
-        run: npm run nexe:android
-      
-      - name: Releases
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
         with:
-          name: "The Bds Maneger Release"
-          tag_name: "Bds_Maneger_${{ github.run_id }}"
-          files: "Bds_Maneger_Bin-*"
-          body: "Android"
+          push: true
+          target: bdscore
+          tags: bdsmaneger/maneger:nightly
+          platforms: linux/amd64,linux/arm64,linux/arm/v7

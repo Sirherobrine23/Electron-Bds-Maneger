@@ -121,8 +121,10 @@ bds_start.log
 # |--------- Old Bds Maneger
 
 # The New
-
 BdsManagerBin
 Register.json
 User.json
 Config.json
+
+# Nexe Copiler
+.nexe

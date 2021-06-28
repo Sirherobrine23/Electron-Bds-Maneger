@@ -26,11 +26,24 @@ if (options.h || options.help){
     exit()
 }
 
+if (options.DockerImage) console.log("Old docker image is now in bdsmaneger/core, bdsmaneger/maneger will now be Bds Maneger web interface.");
+
 const BdsPort = (options.port || options.p || 3000)
 const PathExec = (options.cwd || process.cwd())
 
 // Enable Bds Maneger Core API
 require("@the-bds-maneger/core/rest/api").api()
+
+// set up rate limiter: maximum of five requests per minute
+var RateLimit = require("express-rate-limit");
+var limiter = new RateLimit({
+    windowMs: 1*60*1000, // 1 minute
+    max: 9000,
+    message: "You made the maximum server requests please wait 1 minute"
+});
+
+// apply rate limiter to all requests
+app.use(limiter);
 
 // Register
 const UserConfig = resolve(PathExec, "User.json");
@@ -107,8 +120,10 @@ function sendLog(data = ""){
 
 io.on("connection", (socket) => {
     console.log(`User Id Connected: ${socket.id}`);
-    const parseLogFile = readFileSync(join(bds.BdsSettigs.GetPaths("log"), "latest.log"), "utf8").split("\n").filter(data =>{return (data !== "")})
-    socket.send(parseLogFile)
+    if (existsSync(join(bds.BdsSettigs.GetPaths("log"), "latest.log"))) {
+        const parseLogFile = readFileSync(join(bds.BdsSettigs.GetPaths("log"), "latest.log"), "utf8").split("\n").filter(data =>{return (data !== "")})
+        socket.send(parseLogFile)
+    }
     socket.on("disconnect", ()=>{
         console.log(`User disconnected ${socket.id}`);
     })
