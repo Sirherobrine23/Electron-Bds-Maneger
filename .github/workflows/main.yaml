@@ -7,7 +7,7 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  deleteOldReleases:
+  deleteReleases:
     runs-on: ubuntu-latest
     name: Delete old releases
     steps:
@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@main
 
     - name: Delete Old Releases
-      uses: dev-drprasad/delete-older-releases@master
+      uses: Sirherobrine23/delete-older-releases@master
       with:
         delete_tags: true
         keep_latest: 1
@@ -24,6 +24,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   BuildBDSWeb:
+    needs: [deleteReleases]
     strategy:
       matrix:
         os:
@@ -70,6 +71,7 @@ jobs:
           prerelease: true
 
   docker:
+    needs: [deleteReleases]
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
