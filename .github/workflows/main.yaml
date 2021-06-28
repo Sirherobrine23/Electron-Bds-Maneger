@@ -19,7 +19,7 @@ jobs:
       with:
         delete_tags: true
         keep_latest: 1
-        delete_tag_pattern: Pre_Bds_Maneger_*
+        delete_tag_pattern: Pre_Bds_Maneger_
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
