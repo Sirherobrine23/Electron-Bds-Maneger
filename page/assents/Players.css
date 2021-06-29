@@ -8,6 +8,12 @@
     background-color: red;
 }
 
+.buttomMainStyle {
+    transition: all 0.03s, ease 0.1s;
+    border-radius: 4px;
+    background-color: var(--bg-secondary);
+}
+
 .players {
     background-color: #aaaa;
     padding-top: 5px;
@@ -27,7 +33,9 @@
 .ListPlayers {
     margin-left: 15vw;
     margin-right: 15vw;
-    height: 10vh;
+    overflow: scroll;
+    overflow-x: hidden;
+    height: 100%;
 }
 
 .PlayersHead {

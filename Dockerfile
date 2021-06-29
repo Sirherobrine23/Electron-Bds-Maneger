@@ -16,4 +16,4 @@ USER thebds
 VOLUME [ "/home/bds/bds_core" ]
 
 WORKDIR /home/bds/
-ENTRYPOINT [ "/opt/BdsManegerWeb/index.js" , "--DockerImage", "--cwd" ,"/home/bds/bds_core" ]
+ENTRYPOINT [ "/opt/BdsManegerWeb/index.js" , "--DockerImage" ]

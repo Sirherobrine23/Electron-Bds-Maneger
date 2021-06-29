@@ -12,6 +12,7 @@ const MoreOptions = {
     resources: [
         resolve(__dirname, "page"),
         resolve(__dirname, "package*.json"),
+        resolve(__dirname, "lib"),
     ],
 }
 if (opt.android) {
