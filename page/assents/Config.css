@@ -1,0 +1,32 @@
+input, select {
+    border-radius: 7px;
+}
+
+.ConfigRoot {
+    margin-top: 10vh;
+    margin-left: 4vw;
+    margin-right: 4vw;
+    margin-top: 10vh;
+}
+
+.Server_Settings {
+    text-align: left;
+}
+
+.Server_Download {
+    text-align: right;
+}
+
+.ServerConfigHead {
+    margin-top: 10vh;
+    text-align: center;
+    margin-top: 10vh;
+    border-top: var(--bg-primary) 7px;
+    border-top-style: groove;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.BoxResize {
+    transition: all 1s, easy 0.1s;
+}

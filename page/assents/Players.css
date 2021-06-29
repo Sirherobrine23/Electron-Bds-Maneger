@@ -1,0 +1,36 @@
+.BanUser {
+    transition: all 0.03s, ease 0.1s;
+    border-radius: 4px;
+    margin-left: 8px;
+    background-color: var(--bg-secondary);
+}
+.BanUser:hover {
+    background-color: red;
+}
+
+.players {
+    background-color: #aaaa;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+.KickUser {
+    transition: all 0.5s, ease 0.2s;
+    border-radius: 4px;
+    background-color: var(--bg-secondary);
+}
+.KickUser:hover {
+    background-color: blue;
+}
+
+.ListPlayers {
+    margin-left: 15vw;
+    margin-right: 15vw;
+    height: 10vh;
+}
+
+.PlayersHead {
+    margin-top: 12vh;
+    text-align: center;
+}

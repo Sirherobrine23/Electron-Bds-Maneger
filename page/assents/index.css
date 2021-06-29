@@ -22,10 +22,14 @@
     --color-success: rgb(17, 173, 14);
 }
 
-*{
+* {
     font-family: "minecraft", "minecraft-bold", "minecraft-regular";
     color: var(--text-primary);
+    font-size: large;
 }
+
+/* Inputs Colors */
+select, input[type="text"], input[type="number"], input[type="submit"], input[type="button"] {background-color: var(--bg-secondary); color: var(--text-primary);}
 
 .login_submit {
     background-color: var(--bg-secondary);

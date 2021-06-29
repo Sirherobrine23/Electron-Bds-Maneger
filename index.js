@@ -11,8 +11,8 @@ const uuid = require("uuid").v4
 const bodyParser = require("body-parser");
 const { exit } = require("process");
 const bds = require("@the-bds-maneger/core");
-
 const options = require("minimist")(process.argv.slice(2));
+const proxy = require("express-http-proxy")
 
 if (options.h || options.help){
     const help = [
@@ -33,6 +33,7 @@ const PathExec = (options.cwd || process.cwd())
 
 // Enable Bds Maneger Core API
 require("@the-bds-maneger/core/rest/api").api()
+app.use("/api", proxy("http://localhost:1932"))
 
 // set up rate limiter: maximum of five requests per minute
 var RateLimit = require("express-rate-limit");
@@ -120,7 +121,7 @@ function sendLog(data = ""){
 
 io.on("connection", (socket) => {
     console.log(`User Id Connected: ${socket.id}`);
-    if (existsSync(join(bds.BdsSettigs.GetPaths("log"), "latest.log"))) {
+    if (existsSync(join(bds.BdsSettigs.GetPaths("log"), "latest.log")) && bds.detect()) {
         const parseLogFile = readFileSync(join(bds.BdsSettigs.GetPaths("log"), "latest.log"), "utf8").split("\n").filter(data =>{return (data !== "")})
         socket.send(parseLogFile)
     }
@@ -129,33 +130,65 @@ io.on("connection", (socket) => {
     })
 });
 
-
 // URi
 app.use("/assents", express.static(resolve(__dirname, "page/assents/")))
 app.get("/", (req, res) => res.redirect("/login"));
+app.get("/index", (req, res)=>{res.redirect("/login")})
+app.get("/bds", (req, res)=>{res.redirect("/login")})
 
-app.get("/index", (req, res)=>{
-    const body = req.query
-    if (checkUUID(body.uuid)) {
+// Index
+app.get("/bds/:UUID/index", (req, res)=>{
+    const body = req.params
+    if (checkUUID(body.UUID)) {
         var Index = readFileSync(resolve(__dirname, "page/index.html"), "utf8").toString();
-        Index = Index.split("@{{UUID}}").join(body.uuid)
+        Index = Index.split("@{{UUID}}").join(body.UUID)
         return res.send(Index)
     } else res.redirect("/login")
 })
 
-app.get("/index/settings/:UUID", (req, res)=>{
-    const body = req.params
-    if (checkUUID(body.UUID)) {
-        var ConfigHTML = readFileSync(resolve(__dirname, "page/config.html"), "utf8")
-        ConfigHTML = ConfigHTML.split("@{{UUID}}").join(body.UUID)
-        return res.send(ConfigHTML);
-    }
+// Players
+app.get("/bds/:UUID/players", (req, res)=>{
+    if (checkUUID(req.params.UUID)) return res.sendFile(resolve(__dirname, "page/players.html"))
     else res.redirect("/login")
 })
 
-app.post("/index/settings/:UUID/save", (req, res)=>{
-    res.sendStatus(401)
+// Server Settings
+app.get("/bds/:UUID/settings", (req, res)=>{
+    if (checkUUID(req.params.UUID)) return res.sendFile(resolve(__dirname, "page/config.html"));
+    else res.redirect("/login")
 })
+
+app.post("/bds/:UUID/settings/save", (req, res)=>{
+    if (checkUUID(req.params.UUID)) {
+        bds.set_config(req.body)
+        res.redirect("../index")
+    }
+    else res.sendStatus(401)
+})
+
+app.get("/bds/:UUID/settings/get", (req, res)=>{
+    if (checkUUID(req.params.UUID)) return res.json(bds.get_config())
+    else res.sendStatus(401)
+})
+
+app.get("/bds/:UUID/running", (req, res)=>{
+    if (checkUUID(req.params.UUID)) return res.json({running: bds.detect()})
+    else res.sendStatus(404)
+})
+
+app.post("/bds/:UUID/settings/Server/:PLATFORM/:VERSION", (req, res)=>{
+    if (checkUUID(req.params.UUID)) {
+        if (req.params.PLATFORM) bds.BdsSettigs.UpdatePlatform(req.params.PLATFORM)
+        try {
+            bds.download(req.params.VERSION, true, function(){
+                return res.sendStatus(200)
+            })
+        } catch (error) {
+            return res.sendStatus(501)
+        }
+    } else res.sendStatus(404)
+})
+
 
 app.get("/logout", (req, res)=>{
     const _uuid = req.query.uuid
@@ -174,7 +207,7 @@ app.get("/logout", (req, res)=>{
 app.post("/GetUserID", (req, res) => {
     const body = req.body
     // Return Status
-    if (checkUser(body.user) && checkPass(body.pass)) res.redirect(`/index?uuid=${getUSerUUID(body.user)}`);
+    if (checkUser(body.user) && checkPass(body.pass)) res.redirect(`/bds/${getUSerUUID(body.user)}/index`);
     else res.redirect("/login?error=L1");
 })
 
@@ -216,7 +249,7 @@ if (Config.register){
         
         configUSer[body.uuid] = User
         writeFileSync(UserConfig, JSON.stringify(configUSer, null, 4));
-        res.redirect(`/index?uuid=${body.uuid}`)
+        res.redirect(`/index/${body.uuid}`)
     })
 } else {
     app.get("/register", (req, res) => {

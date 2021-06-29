@@ -4,34 +4,125 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assents/index.css">
+    <link rel="stylesheet" href="/assents/Config.css">
     <link rel="icon" href="https://github.com/The-Bds-Maneger/Bds-Maneger-Electron/raw/main/bds_pages/assents/mcpe.ico">
     <title>Bds Maneger Server Config</title>
 </head>
 <body>
-    <form action="/index/settings/@{{UUID}}/save" method="post">
-        <p>World Name: <input name="world" type="text"></p>
-        <p>Server Description/motd: <input name="description" type="text"></p>
-        <p>Default Gamemode: <select name="gamemode">
-            <option value="survival">Survival</option>
-            <option value="creative">Creative</option>
-            <option value="hardcore">Hardcore</option>
-        </select></p>
-        <p>Default difficulty: <select name="difficulty">
-            <option value="easy">Easy</option>
-            <option value="peaceful">Peaceful</option>
-            <option value="normal">Normal</option>
-            <option value="hard">Hard</option>
-        </select></p>
-        <input name="players" type="number">
-        <input name="commands" type="checkbox">
-        <input name="account" type="checkbox">
-        <input name="whitelist" type="checkbox">
-        <input name="port" type="number">
-        <input name="portv6" type="number">
-        <input name="seed" type="number">
-        <input type="submit" id="SaveButtom" value="Save Server Config">
-    </form>
+    
+    <div class="ConfigRoot">
+        <div class="Server_Download">
+            <div class="ServerConfigHead"><h2>Download/Reinstall Server</h2></div>
+            <p>Select Platform: 
+                <select id="BdsPlatformSelect">
+                    <option value="bedrock">Minecraft Bedrock Oficial Server</option>
+                    <option value="java">Minecraft Java Oficial Server</option>
+                    <option value="pocketmine">Pocketmine-MP</option>
+                    <option value="jsprismarine">JSPrismarine</option>
+                </select>
+            </p>
+            <p>Version: <select id="BdsVersionDownload"></select></p>
+            <input type="button" id="DownloadServer" value="Download">
+            <script>
+                document.getElementById("DownloadServer").onclick = function(){
+                    const DownloadButton = document.getElementById("DownloadServer");
+                    DownloadButton.setAttribute("disabled", null);
+                    fetch(`settings/Server/${document.getElementById("BdsPlatformSelect").value}/${document.getElementById("BdsVersionDownload").value}`, {method: "POST", mode: "cors"}).then(res => {
+                        if (res.ok) {
+                            alert("Server has been installed successfully");
+                            location.reload(true)
+                        } else if (res.status === 501) {
+                            alert("We were unable to install the server, please see the log For more information or contact the Bds Maneger administrator");
+                            DownloadButton.removeAttribute("disabled")
+                        } else alert("Unidentified error")
+                    })
+                }
+                fetch("https://raw.githubusercontent.com/The-Bds-Maneger/Raw_files/main/Server.json").then(res => {if (res.ok) return res.json(); else {alert("We had an error to consult the Servers versions, try to reload the page or try again later");return {latest: {}, bedrock: {}, java: {}, pocketmine: {}, jsprismarine: {}}}}).then(res => {globalThis.BdsServerVersion = res;ChangeVersions(Object.getOwnPropertyNames(BdsServerVersion["bedrock"]))})
+                function ChangeVersions(VersionArray = []){
+                    const SelectDoc = document.getElementById("BdsVersionDownload");
+                    SelectDoc.innerHTML = "";
+                    for (let version of VersionArray){
+                        const option = document.createElement("option");
+                        option.innerHTML = `v${version}`;
+                        option.value = version;
+                        SelectDoc.appendChild(option)
+                    }
+                }
+                document.getElementById("BdsPlatformSelect").onchange = function(event) {
+                    ChangeVersions(Object.getOwnPropertyNames(BdsServerVersion[document.getElementById("BdsPlatformSelect").value]))
+                }
+            </script>
+        </div>
+        <div class="ServerConfigHead"><h2>Settings Server</h2></div>
+        <div class="Server_Settings">
+            <form action="settings/save" method="post">
+                <p>World Name: 
+                    <input name="world" size="" style="width: 40%;" id="world" type="text" class="BoxResize BoxStyle" value="The Bds Maneger">
+                </p>
+                <p>Server Description/motd: 
+                    <input name="description" size="" style="width: 80%;" id="description" type="text" class="BoxResize BoxStyle" value="it's a beautiful one of a world" style="width: 260px;">
+                </p>
+                <p>Default Gamemode: 
+                    <select name="gamemode" id="gamemode" value="survival">
+                        <option value="survival">Survival</option>
+                        <option value="creative">Creative</option>
+                        <option value="hardcore">Hardcore</option>
+                    </select>
+                </p>
+                <p>Default difficulty: 
+                    <select name="difficulty" id="difficulty" value="normal">
+                        <option value="easy">Easy</option>
+                        <option value="peaceful">Peaceful</option>
+                        <option value="normal">Normal</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </p>
+                <p>Total players allowed on the server: 
+                    <input name="players" type="number" id="players" value="10">
+                </p>
+                <p>Allow privileged players to execute commands: 
+                    <input name="commands" id="commands" type="checkbox">
+                </p>
+                <p>You need to be logged in with an account: 
+                    <input name="account" type="checkbox" id="account" checked>
+                </p>
+                <p>Activate the allowed players (whitelist): 
+                    <input name="whitelist" id="whitelist" type="checkbox">
+                </p>
+                <p>Server Port: 
+                    <input name="port" type="number" id="portv4" value="19132">
+                </p>
+                <p>Server Port (IPv6): 
+                    <input name="portv6" type="number" id="portv6" value="19133">
+                </p>
+                <p>World Seed: 
+                    <input name="seed" type="number" id="seed" value="">
+                </p>
+                <p><input type="submit" id="SaveButtom" value="Save Server Config"></p>
+            </form>
+        </div>
+        <div class="ServerConfigHead"><p><a href="index">Return To Index</a></p></div>
+    </div>
     <script>
+        fetch("settings/get").then(res => {if (res.ok) return res.json(); else return {}}).then(res => {
+            console.log(res)
+            for (let StorageInfo of [
+                "world",
+                "description",
+                "gamemode",
+                "difficulty",
+                "players",
+                "portv4",
+                "portv6",
+                "seed",
+            ]) document.getElementById(StorageInfo).value = res[StorageInfo];
+            for (let Checke of [
+                "account",
+                "whitelist",
+                "commands",
+            ]) document.getElementById(Checke).checked = res[Checke];
+        })
         fetch(`http://${location.hostname}:1932/info`).then(res => {if (res.ok) return res.json(); else return {}}).then(res => {
             if (res.server.running) {
                 document.getElementById("SaveButtom").setAttribute("disabled", null);

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="/assents/index.css">
+    <link rel="stylesheet" href="/assents/Players.css">
+    <link rel="icon" href="https://github.com/The-Bds-Maneger/Bds-Maneger-Electron/raw/main/bds_pages/assents/mcpe.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bds Maneger - Players</title>
+</head>
+<body>
+    <div class="Players_Root">
+        <div class="PlayersHead"><p><h2>Players List</h2></p></div>
+        <div id="ListPlayers" class="ListPlayers"></div>
+        <div class="PlayersHead"><p><a href="index">Return to Home</a></p></div>
+    </div>
+    <script>
+        fetch("api/token").then(res => res.json()).then(res => globalThis.ApiToken = res).catch(()=>globalThis.ApiToken = "ErroGetToken")
+        fetch("/api/players").then(res => res.json()).then(res => {
+            const ArrayPLayers = Object.getOwnPropertyNames(res);
+            const divPlayers = document.getElementById("ListPlayers")
+            for (let players of ArrayPLayers) {
+                const DivDoc = document.createElement("div");
+                DivDoc.classList.add("players")
+                DivDoc.innerHTML = players
+
+                // Ban Button
+                const ButtonBan = document.createElement("button")
+                ButtonBan.classList.add("BanUser")
+                ButtonBan.innerHTML = "Ban"
+                ButtonBan.onclick = function(){fetch(`/api/ban/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})}
+                DivDoc.appendChild(ButtonBan)
+
+                // Kick Player
+                const KickPlayer = document.createElement("button")
+                KickPlayer.classList.add("KickUser")
+                KickPlayer.innerHTML = "Kick"
+                KickPlayer.onclick = function(){
+                    const text = prompt(`Text to kick ${players}`, `you kicked`)
+                    fetch(`/api/kick/${ApiToken}/${players}?text=${text}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})}
+                DivDoc.appendChild(KickPlayer)
+
+                // Publish
+                divPlayers.appendChild(document.createElement("p").appendChild(DivDoc))
+            }
+        })
+    </script>
+</body>
+</html>
