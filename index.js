@@ -10,12 +10,11 @@ const { existsSync, writeFileSync, readFileSync } = require("fs");
 const uuid = require("uuid").v4
 const bodyParser = require("body-parser");
 const bds = require("@the-bds-maneger/core");
-const ManegerConfig = require("./lib/ManegerConfig")
+const ManegerConfig = require("./lib/ManegerConfig");
 const options = require("minimist")(process.argv.slice(2));
-const proxy = require("express-http-proxy")
-const CookieParse = require("cookie-parser")
+const proxy = require("express-http-proxy");
 const RateLimit = require("express-rate-limit");
-const { CheckUser, GetUser, AddUser, SaveConfig } = require("./lib/ManegerConfig");
+const { CheckUser, GetUser, SaveConfig } = require("./lib/ManegerConfig");
 
 if (options.DockerImage) console.log("Old docker image is now in bdsmaneger/core, bdsmaneger/maneger will now be Bds Maneger web interface.");
 const BdsPort = ManegerConfig.GetUIPort()
@@ -27,18 +26,12 @@ app.use("/api", proxy("http://localhost:1932"))
 
 // set up rate limiter: maximum of five requests per minute
 const htmlLimit = readFileSync("./page/Limit.html", "utf8")
-const limiter = new RateLimit({
+// apply rate limiter to all requests
+app.use(new RateLimit({
     windowMs: 5*60*1000, // 5 minute
     max: 9000000,
     message: htmlLimit
-});
-
-// apply rate limiter to all requests
-app.use(limiter);
-
-// Cookie
-app.use(CookieParse(ManegerConfig.GetCookieString()))
-
+}));
 // Register
 const UserConfig = resolve(PathExec, "User.json");
 if(!(existsSync(UserConfig))) writeFileSync(UserConfig, "{}")
@@ -52,6 +45,9 @@ if(!(existsSync(ConfigPath))) writeFileSync(ConfigPath, JSON.stringify(Config, n
 
 const UserRegister = resolve(PathExec, "Register.json");
 writeFileSync(UserRegister, "{}")
+module.exports.UserRegister = UserRegister
+module.exports.app = app
+require("./auth")
 
 console.log((function(){
     console.log("Changing user uuids");
@@ -164,57 +160,11 @@ app.get("/bds/:UUID/logout", (req, res)=>{
 app.post("/GetUserID", (req, res) => {
     const body = req.body
     // Return Status
-    const UserUUID = GetUser(body.user, body.pass, req.cookies._ga)
+    const UserUUID = GetUser(body.user, body.pass)
     if (UserUUID.uid) res.redirect(`/bds/${UserUUID.uid}/index`);
     else res.redirect("/login?error=L1");
 })
 
-if (Config.register){
-    app.get("/register", (req, res) => {
-        const UserUUID = uuid();
-        const Users = JSON.parse(readFileSync(UserRegister, "utf8"));
-        if (Users[UserUUID]) return res.redirect("/register");
-        else Users[UserUUID] = {
-            user: null,
-            pass: null
-        };
-        writeFileSync(UserRegister, JSON.stringify(Users, null, 4));
-        return res.redirect(`/register/${UserUUID}`)
-    })
-
-    app.get("/register/:ID", (req, res) => {
-        const parm = req.params
-        const Users = JSON.parse(readFileSync(UserRegister, "utf8"));
-        if (!(Users[parm.ID])) return res.redirect("/register");
-        return res.sendFile(resolve(__dirname, "page/register.html"))
-    })
-    app.post("/registerSave", (req, res) => {
-        const body = req.body
-        const Register = JSON.parse(readFileSync(UserRegister, "utf8"));
-        if (!(Register[body.uuid])) return res.redirect("/login");
-        const User = {
-            user: body.user,
-            pass: body.pass
-        }
-        // Check
-        if (User.user.length <= 5) return res.redirect(`/register/${body.uuid}?error=15`)
-        if (User.pass.length <= 7) return res.redirect(`/register/${body.uuid}?error=16`)
-        if (CheckUser(User.user)) return res.redirect(`/register/${body.uuid}?error=A`)
-        
-        delete Register[body.uuid]
-        writeFileSync(UserRegister, JSON.stringify(Register, null, 4))
-        AddUser(body.uuid, {
-            "user": User.user,
-            "passworld": User.pass,
-            "cookie": req.cookies._ga
-        })
-        res.redirect(`/bds/${body.uuid}/index`)
-    })
-} else {
-    app.get("/register", (req, res) => {
-        res.redirect("/login")
-    })
-}
 app.get("/login", (req, res) => res.sendFile(resolve(__dirname, "page/login.html")))
 
 // Bds Maneger Services
@@ -253,6 +203,8 @@ app.post("/command", (req, res) => {
         global.BdsExecs[global.TheRunUUID].command(body.command, function(d){res.send(d)})
     } else res.status(401).send("Start Server")
 })
+
+
 
 // Listen Server
 server.listen(BdsPort, () => {console.log(`listening on *:${BdsPort}`)});

@@ -33,7 +33,6 @@
     "dependencies": {
         "@the-bds-maneger/core": "^1.11.1",
         "body-parser": "^1.19.0",
-        "cookie-parser": "^1.4.5",
         "express": "^4.17.1",
         "express-http-proxy": "^1.6.2",
         "express-rate-limit": "^5.2.6",
