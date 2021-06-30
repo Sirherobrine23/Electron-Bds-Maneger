@@ -39,7 +39,7 @@
         "js-yaml": "^4.1.0",
         "minimist": "^1.2.5",
         "nexe": "*",
-        "nodemon": "^2.0.8",
+        "nodemon": "^2.0.9",
         "open": "^8.2.1",
         "socket.io": "^4.1.2",
         "uuid": "^8.3.2"
