@@ -31,7 +31,6 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macos-latest
-          - ARM64
     runs-on: "${{ matrix.os }}"
     name: "System ${{ matrix.os }}"
     steps:
