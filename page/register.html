@@ -35,12 +35,25 @@
         <li>The User must be at least 5 Characters long</li>
         <p>
             <form action="registerSave" method="POST" id="subForm" class="UserRegister">
-                <input type="text" name="user">
-                <p><input type="password" name="pass"></p>
-                <p><input type="hidden" name="uuid" id="uuid"></p>
-                <p><input type="submit" value="Register" id="reg"></p>
+                <input type="text" name="user" id="username">
+                <p><input type="password" name="pass" id="passworld"></p>
+                <p><input type="submit" value="Register" id="regButtom"></p>
             </form>
         </p>
     </div>
+    <script>
+        const form = document.getElementById("subForm");
+        function checkReq(){
+            const _a = document.getElementById("username");
+            const _b = document.getElementById("passworld");
+            const _c = document.getElementById("regButtom");
+            // Username
+            if (_a.value.length >= 5) _c.removeAttribute("disabled"); else _c.setAttribute("disabled", null)
+            if (_b.value.length >= 8) _c.removeAttribute("disabled"); else _c.setAttribute("disabled", null)
+        }
+        form.onchange = checkReq;
+        form.oninput = checkReq;
+        form.onkeypress = checkReq;
+    </script>
 </body>
 </html>

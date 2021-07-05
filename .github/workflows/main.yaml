@@ -1,4 +1,4 @@
-name: Binaries
+name: Pre Bin
 on: 
   push:
     branches:
@@ -51,13 +51,6 @@ jobs:
 
       - name: Build Bds Maneger
         run: npm run nexe
-
-      - name: Build Bds Maneger - Android ARM64
-        if : matrix.os == 'ARM64'
-        run: |
-          rm -rfv .nexe
-          rm -rfv ~/.nexe
-          npm run nexe:android
 
       - name: Releases
         uses: softprops/action-gh-release@master

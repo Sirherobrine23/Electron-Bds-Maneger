@@ -29,7 +29,7 @@
                 const ButtonBan = document.createElement("button")
                 ButtonBan.classList.add("BanUser", "buttomMainStyle")
                 ButtonBan.innerHTML = "Ban"
-                ButtonBan.onclick = () => fetch(`/api/players/ban/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})
+                ButtonBan.onclick = () => fetch(`/api/players/actions/ban/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})
                 DivDoc.appendChild(ButtonBan)
 
                 // Kick Player
@@ -38,7 +38,7 @@
                 KickPlayer.innerHTML = "Kick"
                 KickPlayer.onclick = function(){
                     const text = prompt(`Text to kick ${players}`, `you kicked`)
-                    fetch(`/api/players/kick/${ApiToken}/${players}?text=${text}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})
+                    fetch(`/api/players/actions/kick/${ApiToken}/${players}?text=${text}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})
                 }
                 DivDoc.appendChild(KickPlayer)
                 
@@ -46,14 +46,14 @@
                 const OPPlayer = document.createElement("button")
                 OPPlayer.classList.add("opUser", "buttomMainStyle")
                 OPPlayer.innerHTML = "OP"
-                OPPlayer.onclick = () => fetch(`/api/players/op/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) alert(`The ${players} was dedicated to users with op`)})
+                OPPlayer.onclick = () => fetch(`/api/players/actions/op/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) alert(`The ${players} was dedicated to users with op`)})
                 DivDoc.appendChild(OPPlayer)
                 
                 // deop Player
                 const DeopPlayer = document.createElement("button")
                 DeopPlayer.classList.add("DeopUser", "buttomMainStyle")
                 DeopPlayer.innerHTML = "Deop"
-                DeopPlayer.onclick = () => fetch(`/api/players/deop/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) alert(`${Players} has been removed from op users`)})
+                DeopPlayer.onclick = () => fetch(`/api/players/actions/deop/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) alert(`${Players} has been removed from op users`)})
                 DivDoc.appendChild(DeopPlayer)
 
                 // Publish

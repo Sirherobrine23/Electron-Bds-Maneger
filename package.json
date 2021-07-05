@@ -1,6 +1,6 @@
 {
-    "name": "bds-manege",
-    "version": "1.11.rc2",
+    "name": "@the-bds-maneger/bds-maneger",
+    "version": "1.11.rc8",
     "description": "A fully web manager, and versatile.",
     "main": "index.js",
     "private": false,

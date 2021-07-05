@@ -6,12 +6,6 @@ updates:
       interval: "daily"
     assignees:
       - "Sirherobrine23"
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    assignees:
-      - "Sirherobrine23"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

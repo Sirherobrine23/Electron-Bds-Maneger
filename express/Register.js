@@ -1,12 +1,14 @@
-const { app, UserRegister } = require("../index")
+const { UserRegister } = require("../index")
+const express = require("express");
+const app = express();
 const { resolve } = require("path");
 const { writeFileSync, readFileSync } = require("fs");
-const uuid = require("uuid").v4
+const uuid = require("crypto").randomUUID;
 const { CheckUser, AddUser, GetManegerEnable } = require("../lib/ManegerConfig");
 
 if (GetManegerEnable().register){
     app.get("/register", (req, res) => {
-        const UserUUID = uuid();
+        const UserUUID = (()=>{var a = uuid().split("-");return a[0] + a[2]})()
         const Users = JSON.parse(readFileSync(UserRegister, "utf8"));
         if (Users[UserUUID]) return res.redirect("/register");
         else Users[UserUUID] = {
@@ -50,3 +52,5 @@ if (GetManegerEnable().register){
         res.redirect("/login")
     })
 }
+
+module.exports = app

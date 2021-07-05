@@ -14,7 +14,7 @@ const ManegerConfig = require("./lib/ManegerConfig");
 const options = require("minimist")(process.argv.slice(2));
 const proxy = require("express-http-proxy");
 const RateLimit = require("express-rate-limit");
-const { CheckUser, GetUser, SaveConfig } = require("./lib/ManegerConfig");
+const { CheckUser } = require("./lib/ManegerConfig");
 
 if (options.DockerImage) console.log("Old docker image is now in bdsmaneger/core, bdsmaneger/maneger will now be Bds Maneger web interface.");
 const BdsPort = ManegerConfig.GetUIPort()
@@ -63,8 +63,7 @@ console.log((function(){
     return "uuids successfully exchanged"
 })());
 
-module.exports.app = app
-require("./express/register")
+app.use(require("./express/Register"))
 
 // Socket.io
 function sendLog(data = ""){
@@ -90,65 +89,8 @@ app.get("/", (req, res) => res.redirect("/login"));
 app.get("/index", (req, res)=>{res.redirect("/login")})
 app.get("/bds", (req, res)=>{res.redirect("/login")})
 
-// Index
-// Bds Auth check
-const session = require("./express/auth");
-
-app.get("/bds/:UUID/index", session, (req, res)=>{
-    const body = req.params
-    var Index = readFileSync(resolve(__dirname, "page/index.html"), "utf8").toString();
-    Index = Index.split("@{{UUID}}").join(body.UUID)
-    return res.send(Index)
-})
-
-// Players
-app.get("/bds/:UUID/players", session, (req, res)=>{
-    return res.sendFile(resolve(__dirname, "page/players.html"))
-})
-
-// Server Settings
-app.get("/bds/:UUID/settings", session, (req, res)=>{
-    return res.sendFile(resolve(__dirname, "page/config.html"));
-})
-
-app.post("/bds/:UUID/settings/save", session, (req, res)=>{
-    bds.set_config(req.body)
-    res.redirect("../index")
-})
-
-app.get("/bds/:UUID/settings/get", session, (req, res)=>{
-    return res.json(bds.get_config())
-})
-
-app.get("/bds/:UUID/running", session, (req, res)=>{
-    return res.json({running: bds.detect()})
-})
-
-app.post("/bds/:UUID/settings/Server/:PLATFORM/:VERSION", session, (req, res)=>{
-    if (req.params.PLATFORM) bds.BdsSettigs.UpdatePlatform(req.params.PLATFORM)
-    try {return bds.download(req.params.VERSION, true, function(){return res.sendStatus(200)})}
-    catch (error) {return res.sendStatus(501)}
-})
-
-app.get("/bds/:UUID/api/token", session, (req, res)=>{
-    const tokenPath = join(bds.BdsSettigs.bds_dir, "bds_tokens.json")
-    if (!(existsSync(tokenPath))) bds.token_register()
-    const Tokens = require(tokenPath)
-    res.json({token: Tokens[0].token})
-})
-
-app.get("/bds/:UUID/logout", (req, res)=>{
-    res.redirect("/login")
-    return SaveConfig()
-})
-
-app.post("/GetUserID", (req, res) => {
-    const body = req.body
-    // Return Status
-    const UserUUID = GetUser(body.user, body.pass)
-    if (UserUUID.uid) res.redirect(`/bds/${UserUUID.uid}/index`);
-    else res.redirect("/login?error=L1");
-})
+// Main Pages
+app.use(require("./express/Main").app)
 
 app.get("/login", (req, res) => res.sendFile(resolve(__dirname, "page/login.html")))
 
