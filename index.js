@@ -32,6 +32,11 @@ app.use(new RateLimit({
     max: 9000000,
     message: htmlLimit
 }));
+
+// Express Settings
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
+
 // Register
 const UserConfig = resolve(PathExec, "User.json");
 if(!(existsSync(UserConfig))) writeFileSync(UserConfig, "{}")
@@ -46,8 +51,6 @@ if(!(existsSync(ConfigPath))) writeFileSync(ConfigPath, JSON.stringify(Config, n
 const UserRegister = resolve(PathExec, "Register.json");
 writeFileSync(UserRegister, "{}")
 module.exports.UserRegister = UserRegister
-module.exports.app = app
-require("./auth")
 
 console.log((function(){
     console.log("Changing user uuids");
@@ -60,9 +63,8 @@ console.log((function(){
     return "uuids successfully exchanged"
 })());
 
-// Express Settings
-app.use(bodyParser.urlencoded({extended: true}))
-app.use(bodyParser.json())
+module.exports.app = app
+require("./express/register")
 
 // Socket.io
 function sendLog(data = ""){
@@ -89,67 +91,50 @@ app.get("/index", (req, res)=>{res.redirect("/login")})
 app.get("/bds", (req, res)=>{res.redirect("/login")})
 
 // Index
-app.get("/bds/:UUID/index", (req, res)=>{
+// Bds Auth check
+const session = require("./express/auth");
+
+app.get("/bds/:UUID/index", session, (req, res)=>{
     const body = req.params
-    if (CheckUser(body.UUID)) {
-        var Index = readFileSync(resolve(__dirname, "page/index.html"), "utf8").toString();
-        Index = Index.split("@{{UUID}}").join(body.UUID)
-        return res.send(Index)
-    } else res.redirect("/login")
+    var Index = readFileSync(resolve(__dirname, "page/index.html"), "utf8").toString();
+    Index = Index.split("@{{UUID}}").join(body.UUID)
+    return res.send(Index)
 })
 
 // Players
-app.get("/bds/:UUID/players", (req, res)=>{
-    if (CheckUser(req.params.UUID)) return res.sendFile(resolve(__dirname, "page/players.html"))
-    else res.redirect("/login")
+app.get("/bds/:UUID/players", session, (req, res)=>{
+    return res.sendFile(resolve(__dirname, "page/players.html"))
 })
 
 // Server Settings
-app.get("/bds/:UUID/settings", (req, res)=>{
-    if (CheckUser(req.params.UUID)) return res.sendFile(resolve(__dirname, "page/config.html"));
-    else res.redirect("/login")
+app.get("/bds/:UUID/settings", session, (req, res)=>{
+    return res.sendFile(resolve(__dirname, "page/config.html"));
 })
 
-app.post("/bds/:UUID/settings/save", (req, res)=>{
-    if (CheckUser(req.params.UUID)) {
-        bds.set_config(req.body)
-        res.redirect("../index")
-    }
-    else res.sendStatus(401)
+app.post("/bds/:UUID/settings/save", session, (req, res)=>{
+    bds.set_config(req.body)
+    res.redirect("../index")
 })
 
-app.get("/bds/:UUID/settings/get", (req, res)=>{
-    if (CheckUser(req.params.UUID)) return res.json(bds.get_config())
-    else res.sendStatus(401)
+app.get("/bds/:UUID/settings/get", session, (req, res)=>{
+    return res.json(bds.get_config())
 })
 
-app.get("/bds/:UUID/running", (req, res)=>{
-    if (CheckUser(req.params.UUID)) return res.json({running: bds.detect()})
-    else res.sendStatus(404)
+app.get("/bds/:UUID/running", session, (req, res)=>{
+    return res.json({running: bds.detect()})
 })
 
-app.post("/bds/:UUID/settings/Server/:PLATFORM/:VERSION", (req, res)=>{
-    if (CheckUser(req.params.UUID)) {
-        if (req.params.PLATFORM) bds.BdsSettigs.UpdatePlatform(req.params.PLATFORM)
-        try {
-            bds.download(req.params.VERSION, true, function(){
-                return res.sendStatus(200)
-            })
-        } catch (error) {
-            return res.sendStatus(501)
-        }
-    } else res.sendStatus(404)
+app.post("/bds/:UUID/settings/Server/:PLATFORM/:VERSION", session, (req, res)=>{
+    if (req.params.PLATFORM) bds.BdsSettigs.UpdatePlatform(req.params.PLATFORM)
+    try {return bds.download(req.params.VERSION, true, function(){return res.sendStatus(200)})}
+    catch (error) {return res.sendStatus(501)}
 })
 
-app.get("/bds/:UUID/api/token", (req, res)=>{
+app.get("/bds/:UUID/api/token", session, (req, res)=>{
     const tokenPath = join(bds.BdsSettigs.bds_dir, "bds_tokens.json")
     if (!(existsSync(tokenPath))) bds.token_register()
     const Tokens = require(tokenPath)
-    if (CheckUser(req.params.UUID)) {
-        res.json({
-            token: Tokens[0].token
-        })
-    } else res.sendStatus(404)
+    res.json({token: Tokens[0].token})
 })
 
 app.get("/bds/:UUID/logout", (req, res)=>{

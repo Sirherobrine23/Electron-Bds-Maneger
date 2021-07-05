@@ -34,24 +34,13 @@
         <li>Password must be at least 8 characters</li>
         <li>The User must be at least 5 Characters long</li>
         <p>
-            <form action="/registerSave" method="POST" id="subForm" class="UserRegister">
+            <form action="registerSave" method="POST" id="subForm" class="UserRegister">
                 <input type="text" name="user">
                 <p><input type="password" name="pass"></p>
                 <p><input type="hidden" name="uuid" id="uuid"></p>
+                <p><input type="submit" value="Register" id="reg"></p>
             </form>
         </p>
     </div>
-    <script>
-        (function(){
-            var href = location.href.split("/")
-            href = href[href.length -1];
-            document.getElementById("uuid").value = href.split("?")[0];
-            const buttom = document.createElement("button");
-            buttom.type = "submit";
-            buttom.innerHTML = "Register"
-            buttom.style.backgroundColor = "var(--bg-secondary)"
-            document.getElementById("subForm").appendChild(buttom)
-        })()
-    </script>
 </body>
 </html>
