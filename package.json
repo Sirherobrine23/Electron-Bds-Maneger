@@ -31,7 +31,7 @@
     },
     "homepage": "https://github.com/The-Bds-Maneger#readme",
     "dependencies": {
-        "@the-bds-maneger/core": "^1.11.1",
+        "@the-bds-maneger/core": "github:The-Bds-Maneger/Bds-Maneger-Core",
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
         "express-http-proxy": "^1.6.2",
