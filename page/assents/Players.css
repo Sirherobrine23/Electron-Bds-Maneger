@@ -38,7 +38,7 @@
 /* Small */
 @media only screen and (max-width: 1000px) {
     .ListPlayers {
-        grid-auto-rows: 1%;
+        /* grid-auto-rows: 1%; */
         grid-template-columns: 50% 47.5%;
     }
     .players {
@@ -49,7 +49,7 @@
 /* Large */
 @media only screen and (min-width: 1000px) {
     .ListPlayers {
-        grid-auto-rows: 1.3%;
+        /* grid-auto-rows: 1.3%; */
         grid-template-columns: 24.5% 25% 25% 24%;
     }
 }
