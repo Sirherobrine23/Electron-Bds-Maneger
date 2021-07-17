@@ -11,53 +11,78 @@
 </head>
 <body>
     <div class="Players_Root">
-        <div class="PlayersHead"><p><h2>Players List</h2></p></div>
+        <div class="PlayersHead">
+            <p><a href="index">Return to Home</a></p>
+            <p><h2>Players List</h2></p>
+        </div>
         <div id="ListPlayers" class="ListPlayers"></div>
-        <div class="PlayersHead"><p><a href="index">Return to Home</a></p></div>
     </div>
     <script>
         fetch("api/token").then(res => res.json()).then(res => globalThis.ApiToken = res.token).catch(()=>globalThis.ApiToken = "ErroGetToken")
+        
+        async function ControlPlayer(mode = "kick", player = "2333aa", text = "You Kicked") {
+            try {
+                return (await (await fetch(`/api/players/actions/${mode}/${ApiToken}/${player}?text=${text}`)).json())
+            } catch (err) {
+                console.info(err);
+                alert(`sorry, there was an error on our part`)
+                return {};
+            }
+        }
+        
         fetch("/api/players").then(res => res.json()).then(res => {
             const ArrayPLayers = Object.getOwnPropertyNames(res);
             const divPlayers = document.getElementById("ListPlayers")
             for (let players of ArrayPLayers) {
+                const _p = document.createElement("p")
                 const DivDoc = document.createElement("div");
                 DivDoc.classList.add("players")
-                DivDoc.innerHTML = players
+                DivDoc.innerHTML = `Player: ${players}`
 
                 // Ban Button
                 const ButtonBan = document.createElement("button")
                 ButtonBan.classList.add("BanUser", "buttomMainStyle")
                 ButtonBan.innerHTML = "Ban"
-                ButtonBan.onclick = () => fetch(`/api/players/actions/ban/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})
-                DivDoc.appendChild(ButtonBan)
+                ButtonBan.onclick = async () => {
+                    const res = await ControlPlayer("ban", players)
+                    if (res.ok) DivDoc.remove()
+                }
+                _p.appendChild(ButtonBan)
 
                 // Kick Player
                 const KickPlayer = document.createElement("button")
                 KickPlayer.classList.add("KickUser", "buttomMainStyle")
                 KickPlayer.innerHTML = "Kick"
-                KickPlayer.onclick = function(){
+                KickPlayer.onclick = async () => {
                     const text = prompt(`Text to kick ${players}`, `you kicked`)
-                    fetch(`/api/players/actions/kick/${ApiToken}/${players}?text=${text}`).then(res => res.json()).then(res => {if (res.ok) DivDoc.remove()})
+                    const res = await ControlPlayer("kick", players, text)
+                    if (res.ok) DivDoc.remove()
                 }
-                DivDoc.appendChild(KickPlayer)
+                _p.appendChild(KickPlayer)
                 
                 // op Player
                 const OPPlayer = document.createElement("button")
                 OPPlayer.classList.add("opUser", "buttomMainStyle")
                 OPPlayer.innerHTML = "OP"
-                OPPlayer.onclick = () => fetch(`/api/players/actions/op/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) alert(`The ${players} was dedicated to users with op`)})
-                DivDoc.appendChild(OPPlayer)
+                OPPlayer.onclick = async () => {
+                    const res = await ControlPlayer("op", players)
+                    if (res.ok) DivDoc.remove()
+                }
+                _p.appendChild(OPPlayer)
                 
                 // deop Player
                 const DeopPlayer = document.createElement("button")
                 DeopPlayer.classList.add("DeopUser", "buttomMainStyle")
                 DeopPlayer.innerHTML = "Deop"
-                DeopPlayer.onclick = () => fetch(`/api/players/actions/deop/${ApiToken}/${players}`).then(res => res.json()).then(res => {if (res.ok) alert(`${Players} has been removed from op users`)})
-                DivDoc.appendChild(DeopPlayer)
+                DeopPlayer.onclick = async () => {
+                    const res = await ControlPlayer("deop", players)
+                    if (res.ok) DivDoc.remove()
+                }
+                _p.appendChild(DeopPlayer)
 
                 // Publish
-                divPlayers.appendChild(document.createElement("p").appendChild(DivDoc))
+                DivDoc.appendChild(_p)
+                divPlayers.appendChild(DivDoc)
             }
         })
     </script>

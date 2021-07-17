@@ -68,6 +68,16 @@
                 </a>
             </li>
             <!-- Players -->
+            <!-- Backup -->
+            <li class="nav-item" id="Backup">
+                <a class="nav-link">
+                    <svg version="1.1" fill="currentColor" x="0px" y="0px" viewBox="0 0 384.971 384.971" style="enable-background:new 0 0 384.971 384.971;">
+                        <path d="M180.455,360.91H24.061V24.061h156.394c6.641,0,12.03-5.39,12.03-12.03s-5.39-12.03-12.03-12.03H12.03 C5.39,0.001,0,5.39,0,12.031V372.94c0,6.641,5.39,12.03,12.03,12.03h168.424c6.641,0,12.03-5.39,12.03-12.03 C192.485,366.299,187.095,00.91,180.455,360.10z"/>
+                    </svg>
+                    <span class="link-text">Backup</span>
+                </a>
+            </li>
+            <!-- Backup -->
             <!-- Logout -->
             <li class="nav-item" id="Logout">
                 <a class="nav-link" href="logout"><svg version="1.1" fill="currentColor" x="0px" y="0px" viewBox="0 0 384.971 384.971" style="enable-background:new 0 0 384.971 384.971;">
@@ -88,6 +98,17 @@
             <input class="command_send"  id="submit_command" value="Command" type="submit">
         </div>
             <script>
+                fetch("api/token").then(res => res.json()).then(res => globalThis.ApiToken = res.token).catch(()=>globalThis.ApiToken = "ErroGetToken")
+                document.getElementById("Backup").onclick = async function (){
+                    const blob = (await (await fetch(`../../api/backup?token=${ApiToken}`)).blob())
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Bds Maneger Backup ${location.host} ${new Date().toString()}.zip`;
+                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                    a.click();    
+                    a.remove();
+                }
                 document.getElementById("command_input").onkeypress = function(event){if (event.which === 13) document.getElementById("submit_command").click()}
                 document.getElementById("submit_command").onclick = function(){
                     fetch("/command", {

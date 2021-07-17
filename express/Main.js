@@ -1,7 +1,7 @@
 const { resolve, join } = require("path");
 const { readFileSync, existsSync } = require("fs");
 const express = require("express");
-const app = express();
+const app = express.Router();
 const bds = require("@the-bds-maneger/core");
 const { CheckUser, GetUser, SaveConfig } = require("../lib/ManegerConfig");
 
@@ -68,4 +68,4 @@ app.post("/GetUserID", (req, res) => {
     else res.redirect("/login?error=L1");
 })
 
-module.exports.app = app
+module.exports = appR => appR.use(app)

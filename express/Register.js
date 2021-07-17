@@ -1,6 +1,6 @@
 const { UserRegister } = require("../index")
 const express = require("express");
-const app = express();
+const app = express.Router();
 const { resolve } = require("path");
 const { writeFileSync, readFileSync } = require("fs");
 const uuid = require("crypto").randomUUID;
@@ -53,4 +53,4 @@ if (GetManegerEnable().register){
     })
 }
 
-module.exports = app
+module.exports = appR => appR.use(app)

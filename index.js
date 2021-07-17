@@ -63,7 +63,7 @@ console.log((function(){
     return "uuids successfully exchanged"
 })());
 
-app.use(require("./express/Register"))
+require("./express/Register")(app)
 
 // Socket.io
 function sendLog(data = ""){
@@ -90,7 +90,7 @@ app.get("/index", (req, res)=>{res.redirect("/login")})
 app.get("/bds", (req, res)=>{res.redirect("/login")})
 
 // Main Pages
-app.use(require("./express/Main").app)
+require("./express/Main")(app)
 
 app.get("/login", (req, res) => res.sendFile(resolve(__dirname, "page/login.html")))
 
