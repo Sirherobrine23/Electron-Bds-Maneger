@@ -7,10 +7,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/assents/index.css">
     <link rel="stylesheet" href="/assents/navBar.css">
+    <link rel="stylesheet" href="/assents/modal.css">
     <link rel="icon" href="https://github.com/The-Bds-Maneger/Bds-Maneger-Electron/raw/main/bds_pages/assents/mcpe.ico">
     <script>
         const socket = io();
-        setInterval(() => {if (socket.disconnected) location.href = "/login"}, 500);
+        // setInterval(() => {if (socket.disconnected) location.href = "/login"}, 500);
     </script>
     <title>Bds Maneger</title>
 </head>
@@ -92,6 +93,21 @@
     </nav><!-- End NAV -->
     <div class="root">
         <div class="logDiv" id="logDir"></div>
+        <div>
+            <a onclick="document.getElementById('ConnectServer').style.display = 'block'" href="#ConnectButtom1">Connect no Server</a>
+            <div class="modal" id="ConnectServer">
+                <div class="modal-content">
+                    <span>Qr code To Connect:</span>
+                    <p><img src="Connect"></img></p>
+                    <input type="text" style="border-radius: 12px; text-align: center;" disabled id="InputConnect">
+                    <a href="#" id="ServerAdd">Add Server</a>
+                    <script>
+                        fetch("Connect?Type=url").then(res => res.json()).then(res=>document.getElementById("InputConnect").value = res.url);
+                        fetch("Connect?Type=Add").then(res => res.json()).then(res=>document.getElementById("ServerAdd").href = res.url);
+                    </script>
+                </div>
+            </div>
+        </div>
         <!-- Command Area -->
         <div class="CommandDiv" onsubmit="alert('Published command');return false">
             <input class="command_input" id="command_input" size="100%"   placeholder="The command is here, there is no need to include the '/'"  type="text">

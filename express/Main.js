@@ -1,9 +1,10 @@
 const { resolve, join } = require("path");
-const { readFileSync, existsSync } = require("fs");
+const { readFileSync, writeFileSync, existsSync } = require("fs");
 const express = require("express");
 const app = express.Router();
 const bds = require("@the-bds-maneger/core");
 const { CheckUser, GetUser, SaveConfig } = require("../lib/ManegerConfig");
+const qrcode = require("qrcode");
 
 // Index
 // Bds Auth check
@@ -40,6 +41,23 @@ app.get("/bds/:UUID/settings/get", session, (req, res)=>{
 
 app.get("/bds/:UUID/running", session, (req, res)=>{
     return res.json({running: bds.detect()})
+})
+
+app.get("/bds/:UUID/Connect", session, (req, res)=>{
+    const { Type } = req.query;
+    const CurrentConfig = bds.get_config();
+    const urlV4 = `${req.hostname}:${CurrentConfig.portv4}`;
+    const urlV6 = `${req.hostname}:${CurrentConfig.portv6}`;
+    if (Type === "url") {
+        res.json({ url: urlV4 })
+    } else if (Type === "Add") {
+        return res.json({url: `minecraft:?addExternalServer=${CurrentConfig.world}|${urlV4}`});
+    } else {
+        qrcode.toBuffer(`minecraft:?addExternalServer=${CurrentConfig.world}|${urlV4}`, {type: "png"}, (err, url) => {
+            if (err) return res.status(400).send({error: "Qrcode error"});
+            res.send(url)
+        });
+    }
 })
 
 app.post("/bds/:UUID/settings/Server/:PLATFORM/:VERSION", session, (req, res)=>{

@@ -21,7 +21,7 @@ const BdsPort = ManegerConfig.GetUIPort()
 const PathExec = ManegerConfig.WebUIPath
 
 // Enable Bds Maneger Core API
-require("@the-bds-maneger/core/rest/api").api()
+require("@the-bds-maneger/core").api()
 app.use("/api", proxy("http://localhost:1932"))
 
 // set up rate limiter: maximum of five requests per minute
